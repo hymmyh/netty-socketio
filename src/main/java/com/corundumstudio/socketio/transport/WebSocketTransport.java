@@ -145,14 +145,13 @@ public class WebSocketTransport extends ChannelInboundHandlerAdapter {
         Packet packet = new Packet(PacketType.MESSAGE);
         if (client != null && client.isTransportChannel(ctx.channel(), Transport.WEBSOCKET)) {
             log.debug("channel inactive {}", client.getSessionId());
-            client.onChannelDisconnect();
+            client.send(packet);
+            client.onChannelDisconnect();                 
+            channel.close();
+            ctx.close();
         }
         super.channelInactive(ctx);
-        if (client != null) {
-            client.send(packet);
-        }
-        channel.close();
-        ctx.close();
+        
     }
 
     private void handshake(ChannelHandlerContext ctx, final UUID sessionId, String path, FullHttpRequest req) {
